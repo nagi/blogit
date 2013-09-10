@@ -1,5 +1,6 @@
 module Blogit
   class Post < ActiveRecord::Base
+    before_save :set_default_type
 
     require "acts-as-taggable-on"
     require "kaminari"
@@ -15,7 +16,7 @@ module Blogit
     # ==============
     # = Attributes =
     # ==============
-    attr_accessible :title, :body, :tag_list, :blogger_type, :blogger_id
+    attr_accessible :title, :body, :tag_list, :blogger_type, :blogger_id, :type_id
 
     def short_body
       truncate(body, length: 400, separator: "\n")
@@ -34,6 +35,7 @@ module Blogit
     # =================
 
     belongs_to :blogger, :polymorphic => true
+    belongs_to :type
 
     has_many :comments, :class_name => "Blogit::Comment"
 
@@ -79,6 +81,12 @@ module Blogit
 
     def check_comments_config
       raise RuntimeError.new("Posts only allow active record comments (check blogit configuration)") unless Blogit.configuration.include_comments == :active_record
+    end
+
+    def set_default_type
+      if type.blank?
+        self.type = Type.find_or_create_by_name(:blog)
+      end
     end
   end
 end

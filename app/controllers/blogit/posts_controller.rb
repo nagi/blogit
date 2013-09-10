@@ -50,11 +50,11 @@ module Blogit
     end
 
     def edit
-      @post = current_blogger.blog_posts.find(params[:id])
+      @post = Post.find(params[:id])
     end
 
     def create
-      @post = current_blogger.blog_posts.new(params[:post])
+      @post = Post.blog_posts.new(params[:post])
       if @post.save
         redirect_to @post, notice: t(:blog_post_was_successfully_created, scope: 'blogit.posts')
       else
@@ -63,7 +63,7 @@ module Blogit
     end
 
     def update
-      @post = current_blogger.blog_posts.find(params[:id])
+      @post = Post.find(params[:id])
       if @post.update_attributes(params[:post])
         redirect_to @post, notice: t(:blog_post_was_successfully_updated, scope: 'blogit.posts')
       else
