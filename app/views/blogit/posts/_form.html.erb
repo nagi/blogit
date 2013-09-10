@@ -18,7 +18,7 @@
     <% end %>
 
     <%= field do %>
-      <%= f.text_area :body, placeholder: t(:write_something_here, scope: 'blogit.posts') %>
+      <%= f.text_area :body, placeholder: t(:write_something_here, scope: 'blogit.posts'), :"data-rich-text" => 'true' %>
     <% end %>
   </fieldset>
 
