@@ -3,8 +3,8 @@ module Blogit
   # Using explicit ::Blogit::ApplicationController fixes NoMethodError 'blogit_authenticate' in
   # the main_app
   class PostsController < ::Blogit::ApplicationController
+    load_and_authorize_resource
 
-  
     # If using Blogit's Create, Update and Destroy actions AND ping_search_engines is
     # set, call ping_search_engines after these requests
     if Blogit.configuration.include_admin_actions
@@ -23,16 +23,11 @@ module Blogit
     blogit_sweeper(:create, :update, :destroy)
 
     def index
-      respond_to do |format|
-        format.xml {
-          @posts = Post.order('created_at DESC')
-        }
-        format.html {
-          @posts = Post.for_index(params[:page])
-        }
-        format.rss {
-          @posts = Post.order('created_at DESC')
-        }
+      @types = Blogit::Type.all.map(&:name)
+      if type = params['type']
+        @posts = Post.for_index(params[:page]).joins(:type).where('name = ?', type)
+      else
+        @posts = Post.for_index(params[:page])
       end
     end
 
@@ -54,7 +49,8 @@ module Blogit
     end
 
     def create
-      @post = Post.blog_posts.new(params[:post])
+      @post = Post.new(params[:post])
+      @post.blogger = current_blogger
       if @post.save
         redirect_to @post, notice: t(:blog_post_was_successfully_created, scope: 'blogit.posts')
       else
@@ -72,7 +68,7 @@ module Blogit
     end
 
     def destroy
-      @post = current_blogger.blog_posts.find(params[:id])
+      @post = Blogit::Post.find(params[:id])
       @post.destroy
       redirect_to posts_url, notice: t(:blog_post_was_successfully_destroyed, scope: 'blogit.posts')
     end

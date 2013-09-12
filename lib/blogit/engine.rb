@@ -10,5 +10,10 @@ module Blogit
       end
       
     end
+
+    config.to_prepare do
+      ApplicationController.helper(ApplicationHelper)
+      ApplicationController.helper(PostsHelper)
+    end
   end
 end

@@ -1,4 +1,4 @@
-<%= login_required do  %>
+<% if can? :manage, Blogit::Post %>
   <%= actions do %>
     <div class="btn-group">
       <%= link_to(t(:edit, scope: 'blogit.posts'), edit_post_path(post), class: 'btn btn-small') %>

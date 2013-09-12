@@ -1,6 +1,7 @@
 module Blogit
   class Post < ActiveRecord::Base
     before_save :set_default_type
+    before_validation :set_blogger
 
     require "acts-as-taggable-on"
     require "kaminari"
@@ -16,7 +17,7 @@ module Blogit
     # ==============
     # = Attributes =
     # ==============
-    attr_accessible :title, :body, :tag_list, :blogger_type, :blogger_id, :type_id
+    attr_accessible :title, :body, :tag_list, :blogger_type, :blogger_id, :type_id, :type
 
     def short_body
       truncate(body, length: 400, separator: "\n")
@@ -55,6 +56,7 @@ module Blogit
     # Returns the blog posts paginated for the index page
     # @scope class
     scope :for_index, lambda { |page_no = 1| order("created_at DESC").page(page_no) }
+    scope :paginated_by_type, lambda { |type = 'blog', page_no = 1| for_index(page_no).joins(:type).where("name = ?", type) }
 
     # ====================
     # = Instance Methods =
@@ -86,6 +88,12 @@ module Blogit
     def set_default_type
       if type.blank?
         self.type = Type.find_or_create_by_name(:blog)
+      end
+    end
+
+    def set_blogger
+      if blogger.blank?
+        self.blogger = User.find_by_username('admin')
       end
     end
   end

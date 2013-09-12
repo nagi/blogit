@@ -1,17 +1,40 @@
-<%= login_required class: "actions", id: "new_blog_post_link" do %>
-  <%= link_to t(:new_article, scope: 'blogit.posts'), new_post_path, class:'btn btn-primary' %>
-<% end %>
-
-<% if @posts.any? %>
-
-  <%= render partial: "blogit/posts/post",
-    collection: @posts,
-    spacer_template: "blog_post_spacer",
-    locals: {for_index: true, show_comments_count: (Blogit.configuration.include_comments == :active_records) }  %>
+<% if current_user.administrator? %>
+  <h3> The Admin Can't Blog</h3>
+  <p> We don't want to end up with blog posts that say 'Written by Admin' at the bottom, so please <%= link_to 'Sign out', destroy_user_session_path, method:'DELETE' %> of the
+  admin account, and log back in as a regular user to manage articles.</p>
 <% else %>
+  <%= login_required class: "actions", id: "new_blog_post_link" do %>
+    <div class="page-header">
+      <%= link_to t(:new_article, scope: 'blogit.posts'), new_post_path, class:'btn pull-right' %>
+      <h2>Create New Article</h2>
+    </div>
+  <% end %>
 
-  <%= render partial: "blogit/posts/empty" %>
+  <div class="categories-widget">
+    <div class="categories-widget-label">Types</div>
+    <div class="categories read">
+      <div class="all category <%= params[:type].blank? ? 'active' : 'inactive'%>">
+        <%= link_to 'All', blogit_path %>
+      </div>
+        <% @types.each do |type| %>
+          <div class="all category <%= params[:type] == type ? 'active' : 'inactive'%>">
+            <%= link_to type.titlecase, blogit_path(type: type), :category => nil %>
+          </div>
+        <% end %>
+    </div>
+  </div>
 
+  <% if @posts.any? %>
+
+    <%= render partial: "blogit/posts/post",
+      collection: @posts,
+      spacer_template: "blog_post_spacer",
+      locals: {for_admin_index: true, show_comments_count: (Blogit.configuration.include_comments == :active_records) }  %>
+  <% else %>
+
+    <%= render partial: "blogit/posts/empty" %>
+
+  <% end %>
+
+  <%= render "pagination" %>
 <% end %>
-
-<%= render "pagination" %>
