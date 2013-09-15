@@ -1,10 +1,20 @@
-<% if defined?(for_index) and for_admin_index %>
-  <%= content_tag(:article, id: "blog_post_#{post.id}", class: "blog_post_gist") do %>
-    <%= render "blogit/posts/blogger_information", post: post %>
-    <%= render "blogit/posts/post_head", post: post %>
-    <%= render "blogit/posts/post_gist", post: post %>
-    <%= render "blogit/posts/post_links", post: post %>
-  <% end %>
+<% if defined?(for_admin_index) and for_admin_index %>
+  <tr>
+    <%= content_tag(:article, id: "blog_post_#{post.id}", class: "blog_post_gist") do %>
+      <td>
+        <%= render "blogit/posts/post_head", post: post %>
+        <%= render "blogit/posts/post_gist", post: post %>
+      </td>
+      <td>
+        <%= "by: <strong>#{post.blogger_display_name}</strong>".html_safe if post.blogger %>
+        <br>
+        <%= time_tag(post.created_at, :format=>'%B %d, %Y %l:%M %p') %>
+      </td>
+      <td>
+      <%= render "blogit/posts/post_links", post: post %>
+      </td>
+    <% end %>
+  </tr>
 <% else %>
   <%= content_tag(:article, id: "blog_post_#{post.id}", class: "blog_post") do %>
     <%# Render the header for this blog post %>

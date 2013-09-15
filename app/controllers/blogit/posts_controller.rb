@@ -25,9 +25,9 @@ module Blogit
     def index
       @types = Blogit::Type.all.map(&:name)
       if type = params['type']
-        @posts = Post.for_index(params[:page]).joins(:type).where('name = ?', type)
+        @posts = Post.for_index(params[:page]).joins(:type).where('name = ?', type).per(40)
       else
-        @posts = Post.for_index(params[:page])
+        @posts = Post.for_index(params[:page]).per(40)
       end
     end
 

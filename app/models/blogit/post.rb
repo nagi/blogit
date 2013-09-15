@@ -56,7 +56,8 @@ module Blogit
     # Returns the blog posts paginated for the index page
     # @scope class
     scope :for_index, lambda { |page_no = 1| order("created_at DESC").page(page_no) }
-    scope :paginated_by_type, lambda { |type = 'blog', page_no = 1| for_index(page_no).joins(:type).where("name = ?", type) }
+    scope :paginated_by_type, lambda { |type, page_no| for_index(page_no).joins(:type).where("name = ?", type) }
+    scope :paginated_by_type_with_tag, lambda { |type, page_no, tag| paginated_by_type(type, page_no).tagged_with(tag) }
 
     # ====================
     # = Instance Methods =
