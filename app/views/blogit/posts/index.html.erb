@@ -16,11 +16,11 @@
       <div class="all category <%= params[:type].blank? ? 'active' : 'inactive'%>">
         <%= link_to 'All', blogit_path %>
       </div>
-        <% @types.each do |type| %>
-          <div class="all category <%= params[:type] == type ? 'active' : 'inactive'%>">
-            <%= link_to type.titlecase, blogit_path(type: type), :category => nil %>
-          </div>
-        <% end %>
+      <% @types.each do |type| %>
+        <div class="all category <%= params[:type] == type ? 'active' : 'inactive'%> <%= "tagged_#{type}" %>">
+          <%= link_to type.titlecase, blogit_path(type: type) %>
+        </div>
+      <% end %>
     </div>
   </div>
 

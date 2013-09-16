@@ -1,6 +1,7 @@
 module Blogit
   class Post < ActiveRecord::Base
     before_save :set_default_type
+    before_save :publish
     before_validation :set_blogger
 
     require "acts-as-taggable-on"
@@ -17,7 +18,7 @@ module Blogit
     # ==============
     # = Attributes =
     # ==============
-    attr_accessible :title, :body, :tag_list, :blogger_type, :blogger_id, :type_id, :type
+    attr_accessible :title, :body, :tag_list, :blogger_type, :blogger_id, :type_id, :type, :is_published
 
     def short_body
       truncate(body, length: 400, separator: "\n")
@@ -55,6 +56,7 @@ module Blogit
 
     # Returns the blog posts paginated for the index page
     # @scope class
+    scope :published, -> { where(is_published: true) }
     scope :for_index, lambda { |page_no = 1| order("created_at DESC").page(page_no) }
     scope :paginated_by_type, lambda { |type, page_no| for_index(page_no).joins(:type).where("name = ?", type) }
     scope :paginated_by_type_with_tag, lambda { |type, page_no, tag| paginated_by_type(type, page_no).tagged_with(tag) }
@@ -89,6 +91,17 @@ module Blogit
     def set_default_type
       if type.blank?
         self.type = Type.find_or_create_by_name(:blog)
+      end
+    end
+
+    def publish
+      if !is_published? && published_on.blank?
+        self.published_on = Time.now
+        puts
+        puts '*' * 80
+        puts 'TODO: Publish to social media'
+        puts '*' * 80
+        puts
       end
     end
 

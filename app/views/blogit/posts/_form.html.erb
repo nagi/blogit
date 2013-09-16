@@ -11,6 +11,16 @@
   </fieldset>
 
   <%= f.select :type_id, Blogit::Type.to_options %>
+  <div class="control-group">
+    <div class="controls">
+    <% if @post.is_published? %>
+      <p>Uncheck this box if you want to hide the article. Bare in mind that this article may have been shared via facebook / twitter.</p>
+    <% else %>
+      <p>Note that the article will be shared on facebook / twitter the first time you save the article with the 'Published' box checked.</p>
+    <% end %>
+    </div>
+  </div>
+  <%= f.check_box :is_published, :label => 'Publish' %>
 
   <div class="form-actions">
     <%= f.submit %> <%=t :or, scope: 'blogit.posts'%>

@@ -2,6 +2,11 @@
   <tr>
     <%= content_tag(:article, id: "blog_post_#{post.id}", class: "blog_post_gist") do %>
       <td>
+        <div class="all category <%= params[:type] == post.type.name ? 'active' : 'inactive'%> <%= "tagged_#{post.type.name}" %>">
+          <%= link_to post.type.name.titlecase, blogit_path(type: post.type.name) %>
+        </div>
+      </td>
+      <td>
         <%= render "blogit/posts/post_head", post: post %>
         <%= render "blogit/posts/post_gist", post: post %>
       </td>
