@@ -28,7 +28,7 @@ module Blogit
     # = Validations =
     # ===============
 
-    validates :title, presence: true, length: { minimum: 1, maximum: 66 }
+    validates :title, presence: true, length: { minimum: 1, maximum: 72 }
     validates :body,  presence: true, length: { minimum: 10 }
     validates :blogger_id, presence: true
 
@@ -94,12 +94,25 @@ module Blogit
       end
     end
 
+    def published_for_the_first_time?
+      is_published_changed? && is_published? && published_on.blank?
+    end
+
     def publish
-      if !is_published? && published_on.blank?
+      if published_for_the_first_time?
         self.published_on = Time.now
+        if type.name == 'blog'
+          tweet = "New blog post - #{title} http://#{Cms::Site.first.hostname}#{Rails.application.routes.url_helpers.blog_article_path(id)}"
+          Rails.logger.info 'Tweeting: ' + tweet
+          Tweeter.new.tweet(tweet)
+        elsif type.name == 'press'
+          tweet = "New press release - #{title} http://#{Cms::Site.first.hostname}#{Rails.application.routes.url_helpers.press_article_path(id)}"
+          Rails.logger.info 'Tweeting: ' + tweet
+          Tweeter.new.tweet(tweet)
+        end
         puts
         puts '*' * 80
-        puts 'TODO: Publish to social media'
+        puts 'TODO: Publish to facebook'
         puts '*' * 80
         puts
       end
