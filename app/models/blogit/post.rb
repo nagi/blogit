@@ -1,7 +1,7 @@
 module Blogit
   class Post < ActiveRecord::Base
     before_save :set_default_type
-    before_save :publish
+    after_save :publish
     before_validation :set_blogger
 
     require "acts-as-taggable-on"
@@ -105,16 +105,13 @@ module Blogit
           tweet = "New blog post - #{title} http://#{Cms::Site.first.hostname}#{Rails.application.routes.url_helpers.blog_article_path(id)}"
           Rails.logger.info 'Tweeting: ' + tweet
           Tweeter.new.tweet(tweet)
+          Facebooker.new.post(tweet)
         elsif type.name == 'press'
           tweet = "New press release - #{title} http://#{Cms::Site.first.hostname}#{Rails.application.routes.url_helpers.press_article_path(id)}"
           Rails.logger.info 'Tweeting: ' + tweet
           Tweeter.new.tweet(tweet)
+          Facebooker.new.post(tweet)
         end
-        puts
-        puts '*' * 80
-        puts 'TODO: Publish to facebook'
-        puts '*' * 80
-        puts
       end
     end
 
